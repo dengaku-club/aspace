@@ -1,0 +1,38 @@
+<body>
+  <div id="target"></div>
+  <script>
+  const space = 'sample_space';
+  const request = new XMLHttpRequest();
+  request.open('GET', `/?space=${space}`, true);
+  request.onreadystatechange = () => {
+    if (request.status !== 200) {
+      console.error(request.responseText);
+    }
+    if (request.readyState === 4) {
+      const records = JSON.parse(request.responseText);
+      for (let record of records) {
+        const div = document.createElement('div');
+        target.appendChild(div);
+        div.style.width = record.canvas_width;
+        div.style.height = record.canvas_height;
+        div.style.backgroundImage = `url(${record.image})`;
+        const keyframes = [];
+        for (let i = 0; i < record.frame_count; i++) {
+          const keyframe = {
+            offset: i / record.frame_count,
+            easing: 'steps(1, end)',
+            backgroundPositionX: `${i * 100}%`,
+          };
+          keyframes.push(keyframe);
+        }
+        div.animate(keyframes, {
+          duration: record.animation_duration,
+          easing: record.animation_easing,
+          iterations: Infinity,
+        });
+      }
+    }
+  };
+  request.send(null);
+  </script>
+</body>

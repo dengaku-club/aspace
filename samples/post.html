@@ -1,0 +1,54 @@
+<body>
+  <canvas id="target1" width="100" height="200"></canvas>
+  <canvas id="target2" width="100" height="200"></canvas>
+
+  <canvas id="whole" width="200" height="200"></canvas>
+
+  <button id="post">post</button>
+
+  <script>
+  // draw canvas
+  const drawRandomRect = context => {
+    context.fillStyle =
+      `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+    context.fillRect(0, 0,
+                     100 + Math.random() * 100, 100 + Math.random() * 100);
+  }
+  drawRandomRect(target1.getContext('2d'));
+  drawRandomRect(target2.getContext('2d'));
+
+  // connect all canvas images
+  const imageData1 = target1.getContext('2d').getImageData(0, 0, 100, 200);
+  const imageData2 = target2.getContext('2d').getImageData(0, 0, 100, 200);
+  const context = whole.getContext('2d');
+  context.putImageData(imageData1, 0, 0);
+  context.putImageData(imageData2, 100, 0);
+
+  post.addEventListener('click', () => {
+    whole.toBlob(blob => {
+      const formData = new FormData();
+      formData.append('space', 'sample_space');
+      formData.append('canvas_width', 100);
+      formData.append('canvas_height', 200);
+      formData.append('frame_count', 2);
+      formData.append('animation_duration', 1000);
+      formData.append('animation_easing', 'linear');
+      formData.append('image', blob);
+
+      const request = new XMLHttpRequest();
+      request.open('POST', '/', true);
+      request.onreadystatechange = () => {
+        if (request.status !== 200) {
+          console.error(request.responseText);
+        }
+        if (request.readyState === 4) {
+          console.log(JSON.parse(request.responseText));
+        }
+      };
+
+      request.send(formData);
+    }, 'image/png');
+
+  });
+  </script>
+</body>
