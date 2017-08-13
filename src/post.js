@@ -2,14 +2,16 @@ const config = require('config');
 const database = require('./database');
 const express = require('express');
 const multer  = require('multer');
+const path = require("path");
 
 const matchMimetype = mimetype => {
   return mimetype.match(/^image\/([A-Za-z]+)/);
 };
 
+const uploadAbsolutePath = path.resolve(config.uploads.directory);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, config.uploads.directory);
+    cb(null, uploadAbsolutePath);
   },
   filename: (req, file, cb) => {
     const space = req.body.space;
@@ -33,8 +35,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 const router = express.Router();
-router.use(config.uploads.url_path,
-           express.static(`${__dirname}/../${config.uploads.directory}`));
+router.use(config.uploads.url_path, express.static(uploadAbsolutePath));
 
 router.post('/', upload.single('image'), (req, res, next) => {
   const space = req.body.space;
