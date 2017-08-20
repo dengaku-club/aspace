@@ -1,5 +1,6 @@
 const config = require('config');
 const Datastore = require('nedb');
+const path = require("path");
 
 const databases = {};
 
@@ -10,7 +11,8 @@ const getDatabase = space => {
       return;
     }
 
-    const filename = `${config.database.directory}/${space}.nedb`;
+    const databasePath = path.resolve(config.database.directory);
+    const filename = `${databasePath}/${space}.nedb`;
     const database = new Datastore({ filename });
     database.loadDatabase(error => {
       if (error) {
