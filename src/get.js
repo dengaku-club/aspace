@@ -5,7 +5,8 @@ const express = require('express');
 const router = express.Router();
 router.get('/', (req, res) => {
   const space = req.query.space;
-  database.find(space).then(records => {
+  const newer = req.query.newer;
+  database.find(space, newer ? parseInt(newer) : 0).then(records => {
     res.contentType('json');
     res.send(records);
   }).catch(error => {
