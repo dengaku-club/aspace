@@ -26,10 +26,11 @@ const getDatabase = space => {
   });
 }
 
-const find = space => {
+const find = (space, newer) => {
   return new Promise((resolve, reject) => {
     getDatabase(space).then(database => {
-      database.find({}, (error, records) => {
+      database.find({timestamp: {"$gt": newer}})
+              .sort({timestamp: 1}).exec((error, records) => {
         if (error) {
           reject(error);
           return;
@@ -61,6 +62,7 @@ const count = space => {
 }
 
 const insert = (space, record) => {
+  record.timestamp = Date.now();
   return new Promise((resolve, reject) => {
     getDatabase(space).then(database => {
       database.insert(record, error => {

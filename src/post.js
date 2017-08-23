@@ -47,7 +47,6 @@ router.post('/', upload.single('image'), (req, res, next) => {
     }
   }
   record.image = `${config.uploads.url_path}/${req.file.filename}`;
-  record.timestamp = Date.now();
   database.insert(space, record).then(record => {
     res.contentType('json');
     res.send(record);
